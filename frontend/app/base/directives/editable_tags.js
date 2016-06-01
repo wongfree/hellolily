@@ -5,7 +5,7 @@ function editableTags() {
         restrict: 'E',
         scope: {
             viewModel: '=',
-            object: '=',
+            // object: '=',
             type: '@',
         },
         templateUrl: 'base/directives/editable_tags.html',
