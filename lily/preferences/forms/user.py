@@ -4,6 +4,7 @@ from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
 from django_password_strength.widgets import PasswordStrengthInput
 from django_password_strength.widgets import PasswordConfirmationInput
+
 from lily.socialmedia.connectors import Twitter, LinkedIn
 from lily.socialmedia.models import SocialMedia
 from lily.tenant.middleware import get_current_user

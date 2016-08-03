@@ -1,3 +1,4 @@
+from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
 from lily.api.nested.mixins import RelatedSerializerMixin
@@ -21,7 +22,23 @@ class LilyUserSerializer(serializers.ModelSerializer):
             'primary_email_account',
             'position',
             'profile_picture',
+            'picture',
         )
+
+    def update(self, instance, validated_data):
+        picture = validated_data.get('picture')
+
+        if not self.partial and not picture:
+            # Clear the picture here because it doesn't work in the update of the view.
+            validated_data['picture'] = None
+
+        return super(LilyUserSerializer, self).update(instance, validated_data)
+
+    def validate_picture(self, value):
+        if value and value.size > 300 * 1024:
+            raise serializers.ValidationError(_('File too large. Size should not exceed 300 KB.'))
+
+        return value
 
 
 class RelatedLilyUserSerializer(RelatedSerializerMixin, LilyUserSerializer):

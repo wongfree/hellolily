@@ -4,6 +4,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.decorators import list_route
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
+from rest_framework.parsers import MultiPartParser
 
 from .serializers import LilyGroupSerializer, LilyUserSerializer, LilyUserTokenSerializer
 from ..models import LilyGroup, LilyUser
@@ -51,6 +52,7 @@ class LilyUserViewSet(mixins.UpdateModelMixin,
     model = LilyUser
     serializer_class = LilyUserSerializer
     queryset = LilyUser.objects
+    parser_classes = (MultiPartParser, )
 
     def get_queryset(self):
         queryset = (self.model.objects
@@ -100,7 +102,16 @@ class LilyUserViewSet(mixins.UpdateModelMixin,
         return Response(serializer.data)
 
     def update(self, request, *args, **kwargs):
-        if self.request.user != self.get_object():
+        instance = self.get_object()
+        picture = self.request.data.get('picture')
+
+        if picture:
+            if not self.request.FILES:
+                # Picture property was set, but no files were sent.
+                # This means it's still the old picture.
+                self.request.data['picture'] = instance.picture
+
+        if self.request.user != instance:
             raise PermissionDenied
 
         return super(LilyUserViewSet, self).update(request, args, kwargs)
